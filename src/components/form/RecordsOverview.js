@@ -69,7 +69,7 @@ export class RecordsOverview extends React.Component {
     }
 
     updateActiveContextUri(contextUri) {
-        this.setState({activeContext: contextUri, rightComponent: RIGHT_DISPLAY_S_FORMS,})
+        this.setState({activeContext: contextUri, rightComponent: RIGHT_COMPARE_VERSIONS,})
         if (this.state.contextUri !== this.state.activeContext) {
             this.setState({highlightRecordKey: null, highlightRecordSnapshotKey: null})
         }
