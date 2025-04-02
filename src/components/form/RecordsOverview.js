@@ -100,7 +100,7 @@ export class RecordsOverview extends React.Component {
         switch (this.state.leftComponent) {
             case LEFT_DISPLAY_VERSIONS_LIST:
                 leftComponent = <FormTemplateVersionList projectName={this.props.match.params.projectName}
-                                                         updateActiveContextUri={this.displayCompareVersions}
+                                                         updateActiveContextUri={this.updateActiveContextUri}
                                                          highlightVersionKey={this.props.match.params.versionKey}/>
                 break;
             case LEFT_DISPLAY_RECORDS_LIST:
@@ -152,27 +152,26 @@ export class RecordsOverview extends React.Component {
                     <ProjectStatistics projectName={this.props.match.params.projectName}/>
                     <hr/>
                     <Button variant="outline-primary" type="submit"
-                            onClick={() => this.setState({leftComponent: LEFT_DISPLAY_RECORDS_LIST})}>
+                            onClick={() => this.setState({leftComponent: LEFT_DISPLAY_RECORDS_LIST, rightComponent: RIGHT_DISPLAY_S_FORMS, activeContext: null})}>
                         Show user records
                     </Button>
                     {' '}
                     <Button variant="outline-primary" type="submit"
                             onClick={() => this.setState({
-                                leftComponent: LEFT_DISPLAY_VERSIONS_LIST,
-                                rightComponent: RIGHT_DISPLAY_VERSION_GRAPH
+                                leftComponent: LEFT_DISPLAY_VERSIONS_LIST, rightComponent: RIGHT_DISPLAY_S_FORMS, activeContext: null
                             })}>
                         Show form versions
                     </Button>
                     {' '}
                     <Button variant="outline-primary" type="submit"
-                            onClick={() => this.setState({rightComponent: RIGHT_DISPLAY_VERSION_GRAPH})}>
+                            onClick={() => this.setState({leftComponent: LEFT_DISPLAY_VERSIONS_LIST, rightComponent: RIGHT_DISPLAY_VERSION_GRAPH})}>
                         Show versions graph
                     </Button>
                     {' '}
-                    {/*<Button variant="outline-primary" type="submit"*/}
-                    {/*        onClick={() => this.setState({rightComponent: RIGHT_COMPARE_VERSIONS})}>*/}
-                    {/*    Compare versions*/}
-                    {/*</Button>*/}
+                    <Button variant="outline-primary" type="submit"
+                            onClick={() => this.setState({leftComponent: LEFT_DISPLAY_VERSIONS_LIST, rightComponent: RIGHT_COMPARE_VERSIONS})}>
+                        Compare versions
+                    </Button>
                     <br/><br/>
                 </Container>
                 <Row>

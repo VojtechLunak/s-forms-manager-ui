@@ -37,7 +37,7 @@ export class SFormsDisplay extends React.Component {
             }).then(response => {
                 return response.data;
             }).then(data => {
-                const jsonLdGraph = JSON.parse(data);
+                const jsonLdGraph = data;
                 if (Array.isArray(jsonLdGraph)) {
                     return jsonLdGraph[0];
                 } else {
