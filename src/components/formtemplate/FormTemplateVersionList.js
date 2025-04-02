@@ -40,25 +40,41 @@ export class FormTemplateVersionList extends React.Component {
             </Alert>
         }
 
-        versions = versions ? versions.map((version, i) => {
-            return <FormTemplateVersionLine key={i}
-                                            isHighlighted={version.internalKey === this.props.highlightVersionKey}
-                                            internalName={version.internalName}
-                                            internalUri={version.internalUri}
-                                            sampleRemoteContextUri={version.sampleRemoteContextUri}
-                                            numberOfQuestionTemplateSnapshots={version.numberOfQuestionTemplateSnapshots}
-                                            projectName={this.props.projectName}
-                                            internalKey={version.internalKey}
-                                            numberOfRecordSnapshots={version.numberOfRecordSnapshots}
-                                            clickHandler={this.props.updateActiveContextUri}/>;
-        }) : <Alert variant={"light"} className={"h-10"}>
-            The list is empty.
-        </Alert>;
+        // Group versions by formTemplateKey
+        const groupedVersions = versions.reduce((groupedVersions, version) => {
+            const key = version.formTemplateKey;
+            if (!groupedVersions[key]) {
+                groupedVersions[key] = [];
+            }
+            groupedVersions[key].push(version);
+            return groupedVersions;
+        }, {});
+
+        // Render grouped versions
+        const versionGroups = Object.keys(groupedVersions).map((formTemplateKey, i) => {
+            const versionLines = groupedVersions[formTemplateKey].map((version, j) => (
+                <FormTemplateVersionLine key={j}
+                                         isHighlighted={version.internalKey === this.props.highlightVersionKey}
+                                         internalName={version.internalName}
+                                         internalUri={version.internalUri}
+                                         sampleRemoteContextUri={version.sampleRemoteContextUri}
+                                         numberOfQuestionTemplateSnapshots={version.numberOfQuestionTemplateSnapshots}
+                                         projectName={this.props.projectName}
+                                         internalKey={version.internalKey}
+                                         numberOfRecordSnapshots={version.numberOfRecordSnapshots}
+                                         clickHandler={this.props.updateActiveContextUri}/>
+            ));
+            return (
+                <div key={i} className={"mb-3"}>
+                    <h5>Form Template Key: {formTemplateKey}</h5>
+                    {versionLines}
+                </div>
+            );
+        });
 
         return <div>
-            <h4>Form template versions ({versions.length})</h4>
-            {versions}
+            <h4>Form template versions</h4>
+            {versionGroups}
         </div>
-
     }
 }
