@@ -69,10 +69,14 @@ export class RecordsOverview extends React.Component {
     }
 
     updateActiveContextUri(contextUri) {
-        this.setState({activeContext: contextUri, rightComponent: RIGHT_COMPARE_VERSIONS,})
+        this.setState({activeContext: contextUri, rightComponent: RIGHT_DISPLAY_S_FORMS,})
         if (this.state.contextUri !== this.state.activeContext) {
             this.setState({highlightRecordKey: null, highlightRecordSnapshotKey: null})
         }
+    }
+
+    displayCompareVersions() {
+        this.setState({rightComponent: RIGHT_COMPARE_VERSIONS})
     }
 
     displayComparedAnswers(comparedSnapshotUri1, comparedSnapshotUri2) {
@@ -96,7 +100,7 @@ export class RecordsOverview extends React.Component {
         switch (this.state.leftComponent) {
             case LEFT_DISPLAY_VERSIONS_LIST:
                 leftComponent = <FormTemplateVersionList projectName={this.props.match.params.projectName}
-                                                         updateActiveContextUri={this.updateActiveContextUri}
+                                                         updateActiveContextUri={this.displayCompareVersions}
                                                          highlightVersionKey={this.props.match.params.versionKey}/>
                 break;
             case LEFT_DISPLAY_RECORDS_LIST:
