@@ -64,7 +64,7 @@ export class FormTemplateVersionLine extends React.Component {
                                     Show sample form
                                 </Button>
                                 <Button variant="outline-primary small" type="submit" size="sm" className="float-right"
-                                        onClick={() => window.open("https://tomasklima.vercel.app/?formUrl=" + API.defaults.baseURL  + "rest/sforms/s-forms-json-ld/"+ this.props.projectName + "/" + this.props.sampleRemoteContextUri.split("/").pop())}>
+                                        onClick={() => window.open("https://tomasklima.vercel.app/?formUrl=" + API.defaults.baseURL  + "/rest/sforms/s-forms-json-ld/"+ this.props.projectName + "/" + this.props.sampleRemoteContextUri.split("/").pop())}>
                                     Open in SForms Editor
                                 </Button>
                             </Row>
