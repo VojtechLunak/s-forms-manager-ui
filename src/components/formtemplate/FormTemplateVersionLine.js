@@ -50,26 +50,34 @@ export class FormTemplateVersionLine extends React.Component {
             <ListGroup variant="flush">
                 <ListGroup.Item>
                     <Row>
-                        <Col xs={9}>
+                        <Col xs={6}>
                             {internalNameDiv}
                             <span>Internal version key: <b>{this.props.internalKey}</b></span>
                             <br/>
                             <span>Number of record snapshots: <b>{this.props.numberOfRecordSnapshots}</b></span>
                             <br/>
                         </Col>
-                        <Col xs={3}>
-                            <Button variant="outline-primary small" type="submit" size="sm" className="float-right"
-                                    onClick={() => this.props.clickHandler(this.props.sampleRemoteContextUri)}>
-                                Display
-                            </Button>
-                            <Button
-                                variant="link" size="sm" className="float-right"
-                                onClick={() => this.setState({collapseOpen: !this.state.collapseOpen})}
-                                aria-controls="example-collapse-text"
-                                aria-expanded={this.state.collapseOpen}
-                            >
-                                Show detail <FontAwesomeIcon color="black" icon={faCaretDown}/>
-                            </Button>
+                        <Col xs={6}>
+                            <Row>
+                                <Button variant="outline-primary small" type="submit" size="sm" className="float-right mr-2"
+                                        onClick={() => this.props.clickHandler(this.props.sampleRemoteContextUri)}>
+                                    Show sample form
+                                </Button>
+                                <Button variant="outline-primary small" type="submit" size="sm" className="float-right"
+                                        onClick={() => window.open("https://tomasklima.vercel.app/?formUrl=http://localhost:1900/form1.json")}>
+                                    Open in SForms Editor
+                                </Button>
+                            </Row>
+                            <Row>
+                                <Button
+                                    variant="link" size="sm" className="float-right"
+                                    onClick={() => this.setState({collapseOpen: !this.state.collapseOpen})}
+                                    aria-controls="example-collapse-text"
+                                    aria-expanded={this.state.collapseOpen}
+                                >
+                                    Show detail <FontAwesomeIcon color="black" icon={faCaretDown}/>
+                                </Button>
+                            </Row>
                         </Col>
                     </Row>
                     <Row>

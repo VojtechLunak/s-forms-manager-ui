@@ -2,14 +2,14 @@ name: Publish Docker Image
 
 on:
   push:
-    branches: [ main, dockerization ]
+    branches: [ master, dockerization ]
   pull_request:
-    branches: [ main, dockerization ]
+    branches: [ master, dockerization ]
   workflow_dispatch:
 env:
   # The last two fragments of the identifier of the docker image
   IMAGE_NAME: ${{ github.repository }}
-  MAIN_BRANCH_NAME: main
+  MAIN_BRANCH_NAME: master
   REGISTRY: ghcr.io
 
 jobs:
