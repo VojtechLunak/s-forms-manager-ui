@@ -60,3 +60,89 @@ function sortQuestionsRecursively(questions, intl) {
         }
     });
 }
+
+function isAnswer(node) {
+    const types = Array.isArray(node["@type"]) ? node["@type"] : [node["@type"]];
+    return types.includes("doc:answer");
+}
+
+function updateIdsRecursively(node, idToOriginMap) {
+    if (Array.isArray(node)) {
+        return node.map((item) => {
+            if (typeof item === "string" && idToOriginMap[item]) {
+                // Replace the value if it matches an ID in the map
+                return idToOriginMap[item];
+            }
+            return updateIdsRecursively(item, idToOriginMap);
+        });
+    } else if (typeof node === "object" && node !== null) {
+        const updatedNode = { ...node };
+        Object.keys(updatedNode).forEach((key) => {
+            const value = updatedNode[key];
+            if (typeof value === "string" && idToOriginMap[value]) {
+                updatedNode[key] = idToOriginMap[value];
+            } else {
+                updatedNode[key] = updateIdsRecursively(value, idToOriginMap);
+            }
+        });
+        return updatedNode;
+    }
+    return node;
+}
+
+export function extractFormTemplateFromFormData(fullJsonld) {
+    const graph = fullJsonld["@graph"];
+    if (!graph) {
+        console.warn("No @graph in input");
+        return null;
+    }
+
+    // Filter out answer nodes
+    let filteredGraph = graph
+        .filter((node) => !isAnswer(node))
+        .map((node) => {
+            const cleaned = { ...node };
+            // 2. Remove hasAnswer (or any other answer-linking props)
+            delete cleaned["has_answer"];
+            delete cleaned["http://onto.fel.cvut.cz/ontologies/form/has_answer"];
+            return cleaned;
+        });
+
+    const idToOriginMap = {};
+    filteredGraph.forEach((node) => {
+        if (node["has-question-origin"]) {
+            idToOriginMap[node["@id"]] = node["has-question-origin"];
+        }
+    });
+
+    filteredGraph = filteredGraph.map((node) => updateIdsRecursively(node, idToOriginMap));
+
+    // Reassign "has-question-origin" to @id in all nodes
+    filteredGraph = filteredGraph.map((node => {
+        node = { ...node };
+        if(node["has-question-origin"]) {
+            node["@id"] = node["has-question-origin"];
+        }
+        return node;
+    }));
+
+    return {
+        "@context": fullJsonld["@context"],
+        "@graph": filteredGraph,
+    };
+}
+
+export async function flattenJsonLdStructure(input) {
+    const flattened = await jsonld.flatten(input);
+
+    const formTemplateNode = flattened.find((node) => {
+        const types = Array.isArray(node["@type"]) ? node["@type"] : [node["@type"]];
+        return types.includes("http://onto.fel.cvut.cz/ontologies/form/form-template");
+    })
+
+    return {
+        "@id": formTemplateNode["@id"],
+        "@graph": flattened
+    };
+}
+
