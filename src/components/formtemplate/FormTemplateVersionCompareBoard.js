@@ -6,6 +6,8 @@ import Row from "react-bootstrap/Row";
 import ReactDiffViewer from 'react-diff-viewer'
 import API from "../../api";
 import Alert from "react-bootstrap/Alert";
+import {Constants} from "s-forms";
+import _constructFormQuestions from "../../utils/utils";
 
 export class FormTemplateVersionCompareBoard extends React.Component {
 
@@ -15,7 +17,9 @@ export class FormTemplateVersionCompareBoard extends React.Component {
             version1: "",
             version2: "",
             rawJsonForm1: "",
+            textForm1: "",
             rawJsonForm2: "",
+            textForm2: "",
             loading: false,
             versions: []
         }
@@ -41,6 +45,92 @@ export class FormTemplateVersionCompareBoard extends React.Component {
         });
     }
 
+    asArray(possibleArray) {
+        if (!possibleArray) return [];
+        return Array.isArray(possibleArray) ? possibleArray : [possibleArray];
+    }
+
+
+    async dfsTraverseQuestionTree(questions, onEnterQuestion, onLeaveQuestion = () => {
+    }) {
+        if (!questions) {
+            return;
+        }
+        questions = await _constructFormQuestions(questions, {locale: "en"});
+        questions = questions[0];
+        console.log(questions);
+
+        const recursiveTraverse = (question) => {
+            onEnterQuestion(question);
+            this.asArray(question[Constants.HAS_SUBQUESTION]).forEach((subq) => {
+                recursiveTraverse(subq);
+            });
+            onLeaveQuestion(question);
+        };
+
+        questions.forEach((q) => recursiveTraverse(q));
+    }
+
+    async getFormSpecification(questions) {
+        let level = -1;
+        const indentation = "    ";
+        const propertyIndentation = "..";
+        let output = "";
+        let questionNumber = 0;
+
+        function onEnterQuestion(q) {
+            level += 1;
+            const ind = indentation.repeat(level);
+
+            questionNumber += 1;
+            const label = q[Constants.RDFS_LABEL] || "Unnamed question";
+            output += `${ind}(${questionNumber}) ${label}\n`;
+
+            if (q[Constants.HELP_DESCRIPTION])
+                output += `${ind}${propertyIndentation}description: ${q[Constants.HELP_DESCRIPTION]}\n`;
+
+            if (q[Constants.REQUIRES_ANSWER] && !q[Constants.USED_ONLY_FOR_COMPLETENESS])
+                output += `${ind}${propertyIndentation}required: ${q[Constants.REQUIRES_ANSWER]}\n`;
+
+            if (q[Constants.USED_ONLY_FOR_COMPLETENESS])
+                output += `${ind}${propertyIndentation}required only for completeness: ${q[Constants.USED_ONLY_FOR_COMPLETENESS]}\n`;
+
+            if (q[Constants.PATTERN])
+                output += `${ind}${propertyIndentation}pattern: ${q[Constants.PATTERN]}\n`;
+
+            if (q[Constants.INPUT_MASK])
+                output += `${ind}${propertyIndentation}mask: ${q[Constants.INPUT_MASK]}\n`;
+
+            if (q[Constants.HAS_VALIDATION_MESSAGE])
+                output += `${ind}${propertyIndentation}validation-message: ${q[Constants.HAS_VALIDATION_MESSAGE]}\n`;
+
+            if (q[Constants.XSD.MIN_INCLUSIVE])
+                output += `${ind}${propertyIndentation}min: ${q[Constants.XSD.MIN_INCLUSIVE]}\n`;
+
+            if (q[Constants.XSD.MAX_INCLUSIVE])
+                output += `${ind}${propertyIndentation}max: ${q[Constants.XSD.MAX_INCLUSIVE]}\n`;
+
+            if (q[Constants.LAYOUT_CLASS]) {
+                if (Array.isArray(q[Constants.LAYOUT_CLASS])) {
+                    q[Constants.LAYOUT_CLASS].sort();
+                }
+                output += `${ind}${propertyIndentation}layout class: ${q[Constants.LAYOUT_CLASS]}\n`;
+            }
+
+            output += "\n";
+        }
+
+        function onLeaveQuestion() {
+            level -= 1;
+        }
+
+        await this.dfsTraverseQuestionTree(questions, onEnterQuestion, onLeaveQuestion).then(
+            () => { this.setState({loading: false});}
+        );
+
+        return output;
+    }
+
     requestFormGenJson(version1, version2) {
         API.post("/rest/sforms/s-forms-json-ld", null, {
             params: {
@@ -48,7 +138,6 @@ export class FormTemplateVersionCompareBoard extends React.Component {
                 "contextUri": version1
             }
         }).then(response => {
-            console.log(response.data);
             return response.data;
         }).then(data => {
             const jsonLdGraph = data;
@@ -58,7 +147,12 @@ export class FormTemplateVersionCompareBoard extends React.Component {
                 return jsonLdGraph;
             }
         }).then(data => {
-            this.setState({rawJsonForm1: JSON.stringify(data, null, 1)});
+            this.setState({rawJsonForm1: data})
+            return data;
+        }).then((data) => {
+            this.getFormSpecification(data).then((output) => {
+                this.setState({textForm1: output});
+            });
         });
         API.post("/rest/sforms/s-forms-json-ld", null, {
             params: {
@@ -66,7 +160,6 @@ export class FormTemplateVersionCompareBoard extends React.Component {
                 "contextUri": version2
             }
         }).then(response => {
-            console.log(response.data);
             return response.data;
         }).then(data => {
             const jsonLdGraph = data;
@@ -76,14 +169,19 @@ export class FormTemplateVersionCompareBoard extends React.Component {
                 return jsonLdGraph;
             }
         }).then(data => {
-            this.setState({rawJsonForm2: JSON.stringify(data, null, 1)});
-        }).then(() => {
-            this.setState({loading: false});
+            this.setState({rawJsonForm2: data});
+            return data;
+        }).then((data) => {
+            this.getFormSpecification(data).then((output) => {
+                this.setState({textForm2: output});
+                this.setState({loading: false});
+            });
         });
     }
 
-    render() {
-        let versions = this.state.versions
+     render() {
+        let versions = this.state.versions;
+
 
         if (!versions || (versions && versions.length === 0)) {
             return <Alert variant={"light"} className={"h-10"}>
@@ -129,12 +227,12 @@ export class FormTemplateVersionCompareBoard extends React.Component {
                         Compare!
                     </Button>
                     <Row>
-                        {this.state.loading ? (
+                        {this.state.loading && this.state.rawJsonForm1 && this.state.rawJsonForm2 && this.state.textForm1 && this.state.textForm2 ? (
                             <div>Loading...</div>
                         ) : (
                             <ReactDiffViewer
-                                oldValue={this.state.rawJsonForm1}
-                                newValue={this.state.rawJsonForm2}
+                                oldValue={this.state.textForm1}
+                                newValue={this.state.textForm2}
                                 splitView={true}
                             />
                         )}
