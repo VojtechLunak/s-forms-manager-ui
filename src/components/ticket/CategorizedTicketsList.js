@@ -27,7 +27,8 @@ export class CategorizedTicketsList extends React.Component {
             loading: true,
             recordTickets: null,
             formVersionTickets: null,
-            questionTickets: null
+            questionTickets: null,
+            contextUri: this.props.contextUri
         }
     }
 
@@ -35,7 +36,23 @@ export class CategorizedTicketsList extends React.Component {
         this.requestTickets();
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.contextUri !== this.props.contextUri) {
+            this.setState({
+                recordTickets: null,
+                formVersionTickets: null,
+                questionTickets: null,
+                contextUri: this.props.contextUri
+            }, () => {
+                this.requestTickets();
+            });
+        }
+    }
+
     requestTickets() {
+        if (!this.props.contextUri) {
+            return;
+        }
         this.setState({loading: true})
         API.post("/rest/ticket/category", null, {
             params: {
@@ -49,7 +66,8 @@ export class CategorizedTicketsList extends React.Component {
                 loading: false,
                 recordTickets: ticketsInCategories.recordTickets,
                 formVersionTickets: ticketsInCategories.formVersionTickets,
-                questionTickets: ticketsInCategories.questionTickets
+                questionTickets: ticketsInCategories.questionTickets,
+                contextUri: this.props.contextUri
             });
         });
     }
