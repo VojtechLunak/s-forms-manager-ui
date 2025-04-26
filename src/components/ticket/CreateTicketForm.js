@@ -21,7 +21,8 @@ export class CreateTicketForm extends React.Component {
             relateToFormVersion: false,
             relateToQuestion: false,
             formTemplateVersionKey: null,
-            ticketUrl: null
+            ticketUrl: null,
+            contextUri: null
         }
         this.onChangeSetState = this.onChangeSetState.bind(this);
         this.onSubmitProject = this.onSubmitProject.bind(this);
@@ -64,12 +65,34 @@ export class CreateTicketForm extends React.Component {
     }
 
     componentDidMount() {
-        this.requestRecordSnapshot()
-        this.requestFormTemplateVersion()
+        this.requestRecordSnapshot();
+        this.requestFormTemplateVersion();
+    }
+
+    componentDidUpdate(prevProps, prevState, ss) {
+        // reset form if the context changes
+        if (prevProps.contextUri !== this.props.contextUri && this.state.contextUri !== this.props.contextUri) {
+            this.setState({
+                name: "",
+                description: "",
+                relateToRecordSnapshot: false,
+                relateToFormVersion: false,
+                relateToQuestion: false,
+                formTemplateVersionKey: null,
+                ticketUrl: null,
+                contextUri: this.props.contextUri,
+                showSuccess: false,
+                showError: false
+            });
+        }
     }
 
     requestFormTemplateVersion() {
-        return API.get("/rest/record/snapshot/find/version", {
+        if (this.state.formTemplateVersionKey && this.state.formTemplateVersionKey === this.props.contextUri) {
+            return;
+        }
+
+        API.get("/rest/record/snapshot/find/version", {
             params: {
                 "projectName": this.props.projectName,
                 "recordSnapshotContextUri": this.props.contextUri,
@@ -80,7 +103,10 @@ export class CreateTicketForm extends React.Component {
     }
 
     requestRecordSnapshot() {
-        return API.get("/rest/record/snapshot/find", {
+        if (this.state.recordSnapshotKey && this.props.contextUri === this.state.recordSnapshotKey) {
+            return;
+        }
+        API.get("/rest/record/snapshot/find", {
             params: {
                 "projectName": this.props.projectName,
                 "recordSnapshotContextUri": this.props.contextUri,
@@ -115,12 +141,16 @@ export class CreateTicketForm extends React.Component {
                         <Row>
                             <Col>
                                 <div>
-                                    <Form onSubmit={this.onSubmitProject} ref={form => this.ticketForm = form}>
+                                    <Form onSubmit={this.onSubmitProject} ref={form => this.ticketForm = form} onChange={() => {
+                                        this.requestRecordSnapshot();
+                                        this.requestFormTemplateVersion();
+                                    }}>
                                         <Form.Group controlId="nameControl">
                                             <Form.Label>Name</Form.Label>
                                             <Form.Control type="text"
                                                           placeholder="ticket name"
                                                           name="name"
+                                                          value={this.state.name}
                                                           onChange={this.onChangeSetState}/>
                                         </Form.Group>
                                         <Form.Group controlId="descriptionControl">
@@ -128,6 +158,7 @@ export class CreateTicketForm extends React.Component {
                                             <Form.Control as="textarea"
                                                           placeholder="ticket description"
                                                           name="description" rows={3}
+                                                          value={this.state.description}
                                                           onChange={this.onChangeSetState}/>
                                         </Form.Group>
                                         <Form.Group>
