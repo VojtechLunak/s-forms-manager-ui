@@ -105,13 +105,21 @@ export function extractFormTemplateFromFormData(fullJsonld) {
             // 2. Remove hasAnswer (or any other answer-linking props)
             delete cleaned["has_answer"];
             delete cleaned["http://onto.fel.cvut.cz/ontologies/form/has_answer"];
+            delete cleaned["has-origin-path-id"];
+            delete cleaned["http://onto.fel.cvut.cz/ontologies/form/has-origin-path-id"];
             return cleaned;
         });
 
     const idToOriginMap = {};
     filteredGraph.forEach((node) => {
         if (node["has-question-origin"]) {
-            idToOriginMap[node["@id"]] = node["has-question-origin"];
+            const qOrigin = node["has-question-origin"];
+            let newOrigin = String(qOrigin);
+            newOrigin = newOrigin.replace(/-qo$/, '');
+            if (qOrigin === newOrigin) {
+                newOrigin = qOrigin + "-" + Date.now().toString().slice(-4);
+            }
+            idToOriginMap[node["@id"]] = newOrigin;
         }
     });
 
@@ -121,7 +129,8 @@ export function extractFormTemplateFromFormData(fullJsonld) {
     filteredGraph = filteredGraph.map((node => {
         node = { ...node };
         if(node["has-question-origin"]) {
-            node["@id"] = node["has-question-origin"];
+            const qOrigin = node["has-question-origin"];
+            node["@id"] = idToOriginMap[qOrigin] || node["@id"];
         }
         return node;
     }));
