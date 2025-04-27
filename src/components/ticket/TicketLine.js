@@ -15,7 +15,7 @@ export class TicketLine extends React.Component {
     handleResolveAndOpenRecord() {
         const shortId = this.extractShortId(this.props.url);
 
-        API.get(`/rest/ticket/resolve?ticketId=${shortId}&formGenUri=${this.props.contextUri}`
+        API.get(`/rest/ticket/resolve?ticketId=${shortId}&formGenUri=${this.props.contextUri}&projectName=${this.props.projectName}`
         ).then(response => {
             if (response.status === 200) {
                 alert("Issue resolved and Record set to 'open' state.");

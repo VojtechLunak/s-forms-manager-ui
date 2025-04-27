@@ -44,6 +44,7 @@ export class CategorizedTicketsList extends React.Component {
                                url={ticket.url}
                                projectRelations={ticket.projectRelations}
                                contextUri={this.props.contextUri}
+                               projectName={this.props.projectName}
             />;
         }) : <Alert variant={"light"} className={"h-10"}>
             The list is empty.
