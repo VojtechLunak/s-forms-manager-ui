@@ -57,7 +57,6 @@ export class RecordsOverview extends React.Component {
                     "recordSnapshotKey": this.props.match.params.recordSnapshotKey,
                 }
             }).then(response => {
-                this.updateActiveContextUri(response.data.remoteSampleContextURI)
                 this.setState({
                     highlightRecordKey: response.data.internalKey,
                     highlightRecordSnapshotKey: this.props.match.params.recordSnapshotKey
@@ -70,7 +69,7 @@ export class RecordsOverview extends React.Component {
 
     updateActiveContextUri(contextUri) {
         this.setState({activeContext: contextUri, rightComponent: RIGHT_DISPLAY_S_FORMS,})
-        if (this.state.contextUri !== this.state.activeContext) {
+        if (this.state.contextUri && this.state.contextUri !== this.state.activeContext) {
             this.setState({highlightRecordKey: null, highlightRecordSnapshotKey: null})
         }
     }

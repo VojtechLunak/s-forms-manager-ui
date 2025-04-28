@@ -9,6 +9,7 @@ import Collapse from "react-bootstrap/Collapse";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCaretDown} from "@fortawesome/free-solid-svg-icons/faCaretDown";
 import {RecordSnapshotList} from "./RecordSnapshotList";
+import API from "../../api";
 
 export class RecordLine extends React.Component {
 
@@ -21,13 +22,36 @@ export class RecordLine extends React.Component {
     }
 
     componentDidMount() {
-        this.setState({ historyCollapseOpen: this.props.isHighlighted });
+        this.setState({ historyCollapseOpen: this.props.highlightRecordSnapshotKey && this.props.isHighlighted });
+        this.requestRecordSnapshots();
     }
 
     componentDidUpdate(prevProps) {
-        if (prevProps.isHighlighted !== this.props.isHighlighted) {
+        if (prevProps.highlightRecordSnapshotKey !== this.props.highlightRecordSnapshotKey) {
             this.setState({ historyCollapseOpen: this.props.isHighlighted });
         }
+    }
+
+    openHistoryForRecordIfSnapshotIsHighlighted() {
+        this.setState({ historyCollapseOpen: true });
+    }
+
+    requestRecordSnapshots() {
+        API.get("/rest/record/snapshot", {
+            params: {
+                "projectName": this.props.projectName,
+                "recordURI": this.props.recordURI
+            }
+        }).then(response => {
+            response.data.forEach(snapshot => {
+                if (snapshot.internalKey === this.props.highlightRecordSnapshotKey) {
+                    this.props.clickHandler(snapshot.remoteSampleContextURI);
+                    this.openHistoryForRecordIfSnapshotIsHighlighted();
+                }
+            });
+        }).catch(error => {
+            console.log(error)
+        });
     }
 
     render() {
