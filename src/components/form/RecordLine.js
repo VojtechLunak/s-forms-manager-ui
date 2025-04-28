@@ -20,6 +20,16 @@ export class RecordLine extends React.Component {
         }
     }
 
+    componentDidMount() {
+        this.setState({ historyCollapseOpen: this.props.isHighlighted });
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.isHighlighted !== this.props.isHighlighted) {
+            this.setState({ historyCollapseOpen: this.props.isHighlighted });
+        }
+    }
+
     render() {
         let historyDiv;
         if (this.state.historyCollapseOpen) {
