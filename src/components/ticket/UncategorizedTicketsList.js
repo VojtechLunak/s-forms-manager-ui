@@ -42,6 +42,7 @@ export class UncategorizedTicketsList extends React.Component {
                                description={ticket.description}
                                url={ticket.url}
                                projectRelations={ticket.projectRelations}
+                               projectName={this.props.projectName}
             />;
         }) : <Alert variant={"light"} className={"h-10"}>
             The list is empty.

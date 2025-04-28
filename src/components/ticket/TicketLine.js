@@ -52,6 +52,7 @@ export class TicketLine extends React.Component {
                                     <span>Question label: <b>{this.props.projectRelations?.relatedQuestionLabel || "-"}</b></span>
                                     <br/>
                                     <br/>
+                                    { this.props.contextUri &&
                                     <Button
                                         variant="success"
                                         size="sm"
@@ -59,6 +60,7 @@ export class TicketLine extends React.Component {
                                     >
                                         Resolve ticket and set record to "open" status
                                     </Button>
+                                    }
 
                                 </div>
                             </Col>
