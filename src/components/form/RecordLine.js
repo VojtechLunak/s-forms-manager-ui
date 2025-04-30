@@ -66,7 +66,7 @@ export class RecordLine extends React.Component {
         }
 
         return <div>
-            <Card className={this.props.isHighlighted ? "bg-warning" : ""}>
+            <Card className={this.props.isHighlighted ? "bg-warning p-1" : ""}>
                 <ListGroup variant="flush">
                     <ListGroup.Item>
                         <Row>
