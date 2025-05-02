@@ -2,4 +2,5 @@
 window.__config__ = {
   REACT_APP_BACKEND_API_URL: '${REACT_APP_BACKEND_API_URL}',
   REACT_APP_PORT: '${REACT_APP_PORT}',
+  BASENAME: '${BASENAME}',
 }
