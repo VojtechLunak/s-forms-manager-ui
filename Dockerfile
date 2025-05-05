@@ -46,5 +46,6 @@ COPY .docker/config.js.template /etc/nginx/config.js.template
 EXPOSE 80
 
 COPY .docker/docker-entrypoint.sh /
+RUN chmod +x /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["nginx", "-g", "daemon off;"]
