@@ -27,6 +27,7 @@ export class RecordsOverview extends React.Component {
             contexts: [],
             recordSnapshotContextUri1: null,
             recordSnapshotContextUri2: null,
+            formTemplateVersionInternalName: null,
             leftComponent: null,
             rightComponent: null,
             activeContext: null,
@@ -67,10 +68,10 @@ export class RecordsOverview extends React.Component {
         }
     }
 
-    updateActiveContextUri(contextUri) {
-        this.setState({activeContext: contextUri, rightComponent: RIGHT_DISPLAY_S_FORMS,})
+    updateActiveContextUri(contextUri, formTemplateVersionInternalName) {
+        this.setState({activeContext: contextUri, rightComponent: RIGHT_DISPLAY_S_FORMS, formTemplateVersionInternalName: formTemplateVersionInternalName})
         if (this.state.contextUri && this.state.contextUri !== this.state.activeContext) {
-            this.setState({highlightRecordKey: null, highlightRecordSnapshotKey: null})
+            this.setState({highlightRecordKey: null, highlightRecordSnapshotKey: null, formTemplateVersionInternalName: null})
         }
     }
 
@@ -119,6 +120,7 @@ export class RecordsOverview extends React.Component {
         switch (this.state.rightComponent) {
             case RIGHT_DISPLAY_S_FORMS:
                 rightComponent = <TicketsWithSFormsBoard contextUri={this.state.activeContext}
+                                                         formTemplateVersionInternalName={this.state.formTemplateVersionInternalName}
                                                          projectName={this.props.match.params.projectName}/>
                 break;
             case RIGHT_COMPARE_VERSIONS:

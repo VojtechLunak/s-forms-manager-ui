@@ -157,6 +157,8 @@ export class FormTemplateVersionCompareBoard extends React.Component {
             this.getFormSpecification(data).then((output) => {
                 this.setState({textForm1: output});
             });
+        }).catch(e => {
+            this.fallbackVersionCall1(version1);
         });
         API.post("/rest/sforms/s-forms-json-ld/version", null, {
             params: {
@@ -180,6 +182,58 @@ export class FormTemplateVersionCompareBoard extends React.Component {
             this.getFormSpecification(data).then((output) => {
                 this.setState({textForm2: output});
                 this.setState({loading: false});
+            });
+        }).catch(e => {
+            this.fallbackVersionCall2(version2);
+        });
+    }
+
+    fallbackVersionCall1(version) {
+        API.post("/rest/sforms/s-forms-json-ld", null, {
+            params: {
+                "projectName": this.props.projectName,
+                "contextUri": version
+            }
+        }).then(response => {
+            return response.data;
+        }).then(data => {
+            const jsonLdGraph = data;
+            if (Array.isArray(jsonLdGraph)) {
+                return jsonLdGraph[0];
+            } else {
+                return jsonLdGraph;
+            }
+        }).then(data => {
+            this.setState({rawJsonForm1: data})
+            return data;
+        }).then((data) => {
+            this.getFormSpecification(data).then((output) => {
+                this.setState({textForm1: output});
+            });
+        });
+    }
+
+    fallbackVersionCall2(version) {
+        API.post("/rest/sforms/s-forms-json-ld", null, {
+            params: {
+                "projectName": this.props.projectName,
+                "contextUri": version
+            }
+        }).then(response => {
+            return response.data;
+        }).then(data => {
+            const jsonLdGraph = data;
+            if (Array.isArray(jsonLdGraph)) {
+                return jsonLdGraph[0];
+            } else {
+                return jsonLdGraph;
+            }
+        }).then(data => {
+            this.setState({rawJsonForm2: data})
+            return data;
+        }).then((data) => {
+            this.getFormSpecification(data).then((output) => {
+                this.setState({textForm2: output});
             });
         });
     }

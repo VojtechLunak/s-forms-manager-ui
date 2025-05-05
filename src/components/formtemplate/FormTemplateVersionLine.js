@@ -60,7 +60,7 @@ export class FormTemplateVersionLine extends React.Component {
                         <Col xs={6}>
                             <Row>
                                 <Button variant="outline-primary small" type="submit" size="sm" className="float-right mr-2"
-                                        onClick={() => this.props.clickHandler(this.props.sampleRemoteContextUri)}>
+                                        onClick={() => this.props.clickHandler(this.props.sampleRemoteContextUri, this.props.internalName)}>
                                     Show sample form
                                 </Button>
                                 <Button variant="outline-primary small" type="submit" size="sm" className="float-right"
