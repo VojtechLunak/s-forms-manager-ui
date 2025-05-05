@@ -132,10 +132,14 @@ export class FormTemplateVersionCompareBoard extends React.Component {
     }
 
     requestFormGenJson(version1, version2) {
-        API.post("/rest/sforms/s-forms-json-ld", null, {
+        const version1Number = this.state.versions.filter(version => version.sampleRemoteContextUri === version1)[0].internalName;
+        const version2Number = this.state.versions.filter(version => version.sampleRemoteContextUri === version2)[0].internalName;
+
+        API.post("/rest/sforms/s-forms-json-ld/version", null, {
             params: {
                 "projectName": this.props.projectName,
-                "contextUri": version1
+                "contextUri": version1,
+                "version": version1Number
             }
         }).then(response => {
             return response.data;
@@ -154,10 +158,11 @@ export class FormTemplateVersionCompareBoard extends React.Component {
                 this.setState({textForm1: output});
             });
         });
-        API.post("/rest/sforms/s-forms-json-ld", null, {
+        API.post("/rest/sforms/s-forms-json-ld/version", null, {
             params: {
                 "projectName": this.props.projectName,
-                "contextUri": version2
+                "contextUri": version2,
+                "version": version2Number
             }
         }).then(response => {
             return response.data;
