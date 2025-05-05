@@ -1,8 +1,9 @@
 import axios from 'axios';
 import useMock from './mock.js';
 import dotenv from 'dotenv';
+import "../config";
 
-//dotenv.config();
+dotenv.config();
 
 const viteEnvPrefix = "RECORD_MANAGER_";
 const ENV = {
@@ -28,7 +29,7 @@ export const getEnv = (name, defaultValue) => {
 
 
 export const REACT_APP_BACKEND_API_URL = getEnv("REACT_APP_BACKEND_API_URL");
-export const BASENAME = getEnv("BASENAME", "");
+export const BASENAME = getEnv("REACT_APP_BASENAME", "");
 
 const apiUrl = REACT_APP_BACKEND_API_URL || 'http://localhost:8088/';
 
