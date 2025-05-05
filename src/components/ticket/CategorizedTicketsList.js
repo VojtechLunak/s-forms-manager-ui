@@ -42,6 +42,7 @@ export class CategorizedTicketsList extends React.Component {
                                name={ticket.name}
                                description={ticket.description}
                                url={ticket.url}
+                               ticketState={ticket.state}
                                projectRelations={ticket.projectRelations}
                                contextUri={this.props.contextUri}
                                projectName={this.props.projectName}

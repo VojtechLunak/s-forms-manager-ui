@@ -4,6 +4,7 @@ import Row from "react-bootstrap/Row";
 import ListGroup from "react-bootstrap/ListGroup";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
+import Badge from "react-bootstrap/Badge";
 import API from "../../api";
 import {Alert, Modal} from "react-bootstrap";
 
@@ -30,12 +31,12 @@ export class TicketLine extends React.Component {
         API.get(`/rest/ticket/resolve?ticketId=${shortId}&formGenUri=${this.props.contextUri}&projectName=${this.props.projectName}`
         ).then(response => {
             if (response.status === 200) {
-                this.setState({ isProcessing: false, alertMessage: "Issue resolved and Record set to 'open' state.", alertVariant: "success", showConfirmModal: false });
+                this.setState({ isProcessing: false, alertMessage: "Issue resolved and Record set to 'open' state. You may now refresh the ticket information.", alertVariant: "success", showConfirmModal: false });
             } else {
                 this.setState({ isProcessing: false, alertMessage: "An error occured when trying to resolve issue and open record.", alertVariant: "danger", showConfirmModal: false });
             }
         }).catch(error => {
-            this.setState({ isProcessing: false, alertMessage: "An error occured when trying to resolve issue and open record.", alertVariant: "danger" });
+            this.setState({ isProcessing: false, alertMessage: "An error occured when trying to resolve issue and open record.", alertVariant: "danger", showConfirmModal: false });
         });
     }
 
@@ -52,6 +53,17 @@ export class TicketLine extends React.Component {
     }
 
     render() {
+        const stateColors = {
+            "OPEN": "success",
+            "CLOSED": "danger",
+            "IN TEST": "warning",
+            "TODO": "primary",
+            "DEPLOYED": "info",
+            "IN PROGRESS": "info"
+        };
+
+        const ticketState = this.props.ticketState || "unknown";
+        const badgeVariant = stateColors[ticketState] || "secondary";
 
         return <Card>
             <ListGroup variant="flush">
@@ -61,8 +73,11 @@ export class TicketLine extends React.Component {
                             <Col>
                                 <div>
                                     <span><b>{this.props.name}</b> (<a href={this.props.url}
-                                                                             target="_blank">link</a>)</span>
+                                                                             target="_blank">link</a>) <Badge variant={badgeVariant} className="mt-2">
+                                        {ticketState.replace("_", " ").toUpperCase()}
+                                    </Badge></span>
                                     <br/>
+
                                     {this.state.alertMessage && (
                                         <Row className="mt-3">
                                             <Col>
