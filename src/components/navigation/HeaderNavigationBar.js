@@ -29,7 +29,7 @@ class HeaderNavigationBar extends React.Component {
         );
         return (
             <Navbar bg="light" expand="lg">
-                <Navbar.Brand as={Link} to="/">S-Forms Manager</Navbar.Brand>
+                <Navbar.Brand as={Link} to="/">SForms Manager</Navbar.Brand>
                 <Navbar.Toggle/>
                 <Navbar.Collapse>
                     <Nav className="mr-auto">

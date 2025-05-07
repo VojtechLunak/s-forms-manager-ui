@@ -6,19 +6,6 @@ import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
 import Button from "react-bootstrap/Button";
 
-function createTicketLines(tickets) {
-    return (tickets && tickets.length !== 0) ? tickets.map((ticket, i) => {
-        return <TicketLine key={i}
-                           name={ticket.name}
-                           description={ticket.description}
-                           url={ticket.url}
-                           projectRelations={ticket.projectRelations}
-        />;
-    }) : <Alert variant={"light"} className={"h-10"}>
-        The list is empty.
-    </Alert>;
-}
-
 export class CategorizedTicketsList extends React.Component {
 
     constructor(props) {
@@ -27,7 +14,8 @@ export class CategorizedTicketsList extends React.Component {
             loading: true,
             recordTickets: null,
             formVersionTickets: null,
-            questionTickets: null
+            questionTickets: null,
+            contextUri: this.props.contextUri
         }
     }
 
@@ -35,7 +23,39 @@ export class CategorizedTicketsList extends React.Component {
         this.requestTickets();
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.contextUri !== this.props.contextUri) {
+            this.setState({
+                recordTickets: null,
+                formVersionTickets: null,
+                questionTickets: null,
+                contextUri: this.props.contextUri
+            }, () => {
+                this.requestTickets();
+            });
+        }
+    }
+
+    createTicketLines(tickets) {
+        return (tickets && tickets.length !== 0) ? tickets.map((ticket, i) => {
+            return <TicketLine key={i}
+                               name={ticket.name}
+                               description={ticket.description}
+                               url={ticket.url}
+                               ticketState={ticket.state}
+                               projectRelations={ticket.projectRelations}
+                               contextUri={this.props.contextUri}
+                               projectName={this.props.projectName}
+            />;
+        }) : <Alert variant={"light"} className={"h-10"}>
+            The list is empty.
+        </Alert>;
+    }
+
     requestTickets() {
+        if (!this.props.contextUri) {
+            return;
+        }
         this.setState({loading: true})
         API.post("/rest/ticket/category", null, {
             params: {
@@ -49,7 +69,8 @@ export class CategorizedTicketsList extends React.Component {
                 loading: false,
                 recordTickets: ticketsInCategories.recordTickets,
                 formVersionTickets: ticketsInCategories.formVersionTickets,
-                questionTickets: ticketsInCategories.questionTickets
+                questionTickets: ticketsInCategories.questionTickets,
+                contextUri: this.props.contextUri
             });
         });
     }
@@ -65,9 +86,9 @@ export class CategorizedTicketsList extends React.Component {
             </Alert>
         }
 
-        const recordTicketsLines = createTicketLines(recordTickets);
-        const formVersionTicketsLines = createTicketLines(formVersionTickets);
-        const questionTicketsLines = createTicketLines(questionTickets);
+        const recordTicketsLines = this.createTicketLines(recordTickets);
+        const formVersionTicketsLines = this.createTicketLines(formVersionTickets);
+        const questionTicketsLines = this.createTicketLines(questionTickets);
 
         return <div>
             <Button className={"float-right"} variant="link" onClick={() => this.requestTickets()}>refresh</Button>

@@ -9,6 +9,7 @@ import Collapse from "react-bootstrap/Collapse";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCaretDown} from "@fortawesome/free-solid-svg-icons/faCaretDown";
 import {RecordSnapshotList} from "./RecordSnapshotList";
+import API from "../../api";
 
 export class RecordLine extends React.Component {
 
@@ -18,6 +19,39 @@ export class RecordLine extends React.Component {
             detailCollapseOpen: false,
             historyCollapseOpen: false
         }
+    }
+
+    componentDidMount() {
+        this.setState({ historyCollapseOpen: this.props.highlightRecordSnapshotKey && this.props.isHighlighted });
+        this.requestRecordSnapshots();
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.highlightRecordSnapshotKey !== this.props.highlightRecordSnapshotKey) {
+            this.setState({ historyCollapseOpen: this.props.isHighlighted });
+        }
+    }
+
+    openHistoryForRecordIfSnapshotIsHighlighted() {
+        this.setState({ historyCollapseOpen: true });
+    }
+
+    requestRecordSnapshots() {
+        API.get("/rest/record/snapshot", {
+            params: {
+                "projectName": this.props.projectName,
+                "recordURI": this.props.recordURI
+            }
+        }).then(response => {
+            response.data.forEach(snapshot => {
+                if (snapshot.internalKey === this.props.highlightRecordSnapshotKey) {
+                    this.props.clickHandler(snapshot.remoteSampleContextURI);
+                    this.openHistoryForRecordIfSnapshotIsHighlighted();
+                }
+            });
+        }).catch(error => {
+            console.log(error)
+        });
     }
 
     render() {
@@ -32,11 +66,11 @@ export class RecordLine extends React.Component {
         }
 
         return <div>
-            <Card className={this.props.isHighlighted ? "bg-warning" : ""}>
+            <Card className={this.props.isHighlighted ? "bg-warning p-1" : ""}>
                 <ListGroup variant="flush">
                     <ListGroup.Item>
                         <Row>
-                            <Col xs={9}>
+                            <Col xs={8}>
                                 <p>
                                 </p>
                                 <span>Internal record key: {this.props.internalKey}</span>
@@ -53,10 +87,11 @@ export class RecordLine extends React.Component {
                                 </b>
                             </span>
                             </Col>
-                            <Col xs={3}>
+                            <Col xs={4}>
+
                                 <Button variant="outline-primary" type="submit" size="sm" className="float-right"
                                         onClick={() => this.props.clickHandler(this.props.remoteSampleContextURI)}>
-                                    Display
+                                    Display with newest template
                                 </Button>
                                 <Button
                                     variant="link" size="sm" className="float-right"

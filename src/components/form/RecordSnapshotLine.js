@@ -15,7 +15,7 @@ export class RecordSnapshotLine extends React.Component {
 
     render() {
 
-        return <Card className={this.props.isHighlighted ? "bg-warning" : ""}>
+        return <Card className={this.props.isHighlighted ? "bg-warning p-1" : ""}>
             <ListGroup variant="flush">
                 <ListGroup.Item>
                     <Row>
@@ -38,8 +38,8 @@ export class RecordSnapshotLine extends React.Component {
                         </Col>
                         <Col xs={3}>
                             <Button variant="outline-primary" type="submit" size="sm" className="float-right"
-                                    onClick={() => this.props.clickHandler(this.props.remoteSampleContextURI)}>
-                                Display
+                                    onClick={() => this.props.clickHandler(this.props.remoteSampleContextURI, this.props.formTemplateVersionInternalName)}>
+                                Display with original template
                             </Button>
                             {' '}
                             {this.props.order <= 0 ? <div/> :

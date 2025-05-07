@@ -29,15 +29,16 @@ export class SFormsDisplay extends React.Component {
 
     requestFormGenJson() {
         if (this.props.contextUri) {
-            API.post("/rest/sforms/s-forms-json-ld", null, {
+            API.post("/rest/sforms/s-forms-json-ld/version", null, {
                 params: {
                     "projectName": this.props.projectName,
-                    "contextUri": this.props.contextUri
+                    "contextUri": this.props.contextUri,
+                    "version": this.props.formTemplateVersionInternalName
                 }
             }).then(response => {
                 return response.data;
             }).then(data => {
-                const jsonLdGraph = JSON.parse(data);
+                const jsonLdGraph = data;
                 if (Array.isArray(jsonLdGraph)) {
                     return jsonLdGraph[0];
                 } else {
@@ -45,6 +46,24 @@ export class SFormsDisplay extends React.Component {
                 }
             }).then(data => {
                 this.setState({rawJsonForm: data});
+            }).catch(error => {
+                API.post("/rest/sforms/s-forms-json-ld", null, {
+                    params: {
+                        "projectName": this.props.projectName,
+                        "contextUri": this.props.contextUri
+                    }
+                }).then(response => {
+                    return response.data;
+                }).then(data => {
+                    const jsonLdGraph = data;
+                    if (Array.isArray(jsonLdGraph)) {
+                        return jsonLdGraph[0];
+                    } else {
+                        return jsonLdGraph;
+                    }
+                }).then(data => {
+                    this.setState({rawJsonForm: data});
+                })
             });
         } else if (this.props.version1 && this.props.version2) {
             API.get("/rest/formGenVersion/compare", {

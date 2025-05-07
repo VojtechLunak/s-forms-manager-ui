@@ -44,6 +44,10 @@ export class RecordList extends React.Component {
             </Alert>
         }
 
+        records.sort((a, b) => {
+            return b.recordCreated - a.recordCreated;
+        });
+
         const recordLines = records ? records.map((record, i) => {
             return <RecordLine key={i}
                                isHighlighted={this.props.highlightRecordKey === record.internalKey}

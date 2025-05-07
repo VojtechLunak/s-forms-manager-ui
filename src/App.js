@@ -12,6 +12,7 @@ import AddProjectForm from "./components/projects/AddProjectForm";
 import {RecordsOverview} from "./components/form/RecordsOverview";
 import {SearchOverview} from "./components/search/SearchOverview";
 import {TicketsOverview} from "./components/ticket/TicketsOverview";
+import {BASENAME} from "./api";
 
 class App extends React.Component {
 
@@ -23,7 +24,7 @@ class App extends React.Component {
     render() {
         return (
             <div>
-                <Router>
+                <Router basename={BASENAME}>
                     <HeaderNavigationBar store={this.props.store}/>
 
                     <Switch>

@@ -10,7 +10,7 @@ export class Paginator extends React.Component {
         super(props);
         this.state = {
             activePage: Math.round(this.props.offset / ITEMS_PER_PAGE) + 1,
-            numberOfPages: Math.round(this.props.totalItems / ITEMS_PER_PAGE),
+            numberOfPages: Math.ceil(this.props.totalItems / ITEMS_PER_PAGE),
         }
     }
 

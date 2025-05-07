@@ -81,7 +81,7 @@ export class TicketsWithSFormsBoard extends React.Component {
             </h5>
             <Collapse in={this.state.displayFormCollapseOpen}>
                 <div id="form-display-collapse">
-                    <SFormsDisplay projectName={this.props.projectName} contextUri={this.props.contextUri}/>
+                    <SFormsDisplay projectName={this.props.projectName} contextUri={this.props.contextUri} formTemplateVersionInternalName={this.props.formTemplateVersionInternalName}/>
                 </div>
             </Collapse>
             <br/>
